@@ -105,4 +105,40 @@ https://ng-bootstrap.github.io/#/components/modal/examples
       }
     }
     modalRef.result会返回一个promise对象
+    6.模态框向调用它的组件传递数据
+      modal.component.ts
+      @Component({
+      selector: 'app-modal',
+      templateUrl: './modal.component.html',
+      styleUrls: ['./modal.component.css']
+      })
+      export class ModalComponent implements OnInit {
+          close() {
+              this.activeModal.close("aaaaa");
+          }
+          constructor(private activeModal:NgbActiveModal) {
+          }
+          ngOnInit() {
+          }
+      }
+      调用模态框的组价
+      import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+      import { ModalComponent } from '../modal/modal.component';
+      export class DashboardComponent implements OnInit {
+        constructor(private modalService:NgbModal) {
+        }
+        open() {
+          const modalRef = this.modalService.open(ModalComponent)
+          modalRef.componentInstance.flag = 1;
+          modalRef.result.then(
+            (result)=>{console.log(result)},
+            (reason)=>{}
+          )
+        }
+        ngOnInit() {
+        }
+      }
+      (result)=>{console.log(result)}这里会将模态框中的
+      this.activeModal.close("aaaaa")中的参数aaaaa打印出来
+      
     
