@@ -1,0 +1,108 @@
+#项目中经常会用到弹出模态框的场景
+ng-bootstrap中提供了很好的模态框解决方案
+具体使用方法有很多种，官网如下：
+https://ng-bootstrap.github.io/#/components/modal/examples
+#为了将模态框中的业务与其他业务分离，建议采用将component作为
+模态框弹出的方法。
+#具体使用方法:
+  1.将要弹出的模态框做成component
+    modal.component.ts
+    import { Component, OnInit } from '@angular/core';
+    import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+    @Component({
+        selector: 'app-modal',
+        templateUrl: './modal.component.html',
+        styleUrls: ['./modal.component.css']
+    })
+    export class ModalComponent implements OnInit {
+
+        close() {
+            this.activeModal.close();
+        }
+
+        constructor(private activeModal:NgbActiveModal) {
+        }
+
+        ngOnInit() {
+        }
+    }
+    modal.component.html
+    <div class="modal-header">
+    <h4 class="modal-title">新建</h4>
+    <button type="button" class="close" aria-label="Close" (click)="close()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <div>测试模态框</div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-sm">确定</button>
+    </div>
+    2.将模态框组件注入调用模态框的地方属于的模块module中
+    @NgModule({
+    entryComponents:[ModalComponent]
+    })
+    3.在需要打开模态框的组件中引入模态框component并使用
+    import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+    import { ModalComponent } from '../modal/modal.component';
+    export class DashboardComponent implements OnInit {
+      constructor(private modalService:NgbModal) {
+      }
+      open() {
+        const modalRef = this.modalService.open(ModalComponent)
+      }
+      ngOnInit() {
+      }
+    }
+    4.如果调用时，需要向模态框组件传递数据
+    import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+    import { ModalComponent } from '../modal/modal.component';
+    export class DashboardComponent implements OnInit {
+      constructor(private modalService:NgbModal) {
+      }
+      open() {
+        const modalRef = this.modalService.open(ModalComponent)
+        modalRef.componentInstance.flag = 1;
+      }
+      ngOnInit() {
+      }
+    }
+    同时需要修改模态框组价，在其中加入
+    @Input flag;输入属性
+    @Component({
+        selector: 'app-modal',
+        templateUrl: './modal.component.html',
+        styleUrls: ['./modal.component.css']
+    })
+    export class ModalComponent implements OnInit {
+        @Input flag;
+        close() {
+            this.activeModal.close();
+        }
+
+        constructor(private activeModal:NgbActiveModal) {
+        }
+
+        ngOnInit() {
+        }
+    }
+    5.如果调用时,需要在模态框关闭后执行相关操作
+    import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+    import { ModalComponent } from '../modal/modal.component';
+    export class DashboardComponent implements OnInit {
+      constructor(private modalService:NgbModal) {
+      }
+      open() {
+        const modalRef = this.modalService.open(ModalComponent)
+        modalRef.componentInstance.flag = 1;
+        modalRef.result.then(
+          (result)=>{},
+          (reason)=>{}
+        )
+      }
+      ngOnInit() {
+      }
+    }
+    modalRef.result会返回一个promise对象
+    
