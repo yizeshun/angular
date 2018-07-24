@@ -1,0 +1,90 @@
+#父组件调用子组件的属性和方法
+  @ViewChild将子组件引入父组件中
+  parent.component.ts
+  import { Component, OnInit, ViewChild } from '@angular/core';
+  import { ChildComponent } from '../child/child.component';
+  @Component({
+      selector: 'app-parent',
+      templateUrl: './parent.component.html',
+      styleUrls: ['./parent.component.css']
+  })
+  export class ParentComponent implements OnInit {
+      @ViewChild(ChildComponent) private child:ChildComponent;
+      constructor() {
+      }
+      ngOnInit() {
+          this.parent();
+      }
+      parent() {
+          console.log("I am parent");
+          this.child.child();
+      }
+  }
+  child.component.ts
+  import { Component, OnInit, Inject } from '@angular/core';
+  @Component({
+      selector: 'app-child',
+      templateUrl: './child.component.html',
+      styleUrls: ['./child.component.css']
+  })
+  export class ChildComponent implements OnInit {
+      constructor() {
+      }
+      ngOnInit() {
+      }
+      child() {
+          console.log("I am child");
+      }
+  }
+  
+#子组件触发的事件通知给父组件
+  @Output装饰器、EventEmitter事件发射器 
+  child.component.ts
+  import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
+  @Component({
+      selector: 'app-child',
+      templateUrl: './child.component.html',
+      styleUrls: ['./child.component.css']
+  })
+  export class ChildComponent implements OnInit {
+      @Output() output:any = new EventEmitter<any>();
+      constructor() {
+      }
+      ngOnInit() {
+      }
+      child() {
+          console.log("I am child");
+      }
+      childClick() {
+          this.output.emit("I am child")
+      }
+  }
+  parent.component.html
+  <p>parent works!</p>
+  <app-child (output)="childEvent($event)"></app-child>
+  parent.component.ts
+  import { Component, OnInit, ViewChild } from '@angular/core';
+  @Component({
+      selector: 'app-parent',
+      templateUrl: './parent.component.html',
+      styleUrls: ['./parent.component.css']
+  })
+  export class ParentComponent implements OnInit {
+      constructor() {
+      }
+      ngOnInit() {
+          this.parent();
+      }
+      parent() {
+          console.log("I am parent");
+      }
+      childEvent(e) {
+          console.log(e)
+      }
+  }
+  
+
+
+  
+
+  
