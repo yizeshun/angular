@@ -83,6 +83,53 @@
       }
   }
   
+#父组件数据流入子组件
+  @Input()规定组件的输入属性，通过将父组件的变量赋值给输入属性,
+  达到父组件向子组件传递数据,这里属性和方法都可以传入.
+  child.component.ts
+  import { Component, OnInit, Inject, Output, Input, EventEmitter } from '@angular/core';
+  @Component({
+      selector: 'app-child',
+      templateUrl: './child.component.html',
+      styleUrls: ['./child.component.css']
+  })
+  export class ChildComponent implements OnInit {
+      @Input() myParent:string;
+      constructor() {
+      }
+      ngOnInit() {
+          this.child();
+      }
+      child() {
+          console.log("I am child");
+          console.log(this.myParent);
+      }
+  }
+  parent.component.ts
+  import { Component, OnInit, ViewChild } from '@angular/core';
+  @Component({
+      selector: 'app-parent',
+      templateUrl: './parent.component.html',
+      styleUrls: ['./parent.component.css']
+  })
+  export class ParentComponent implements OnInit {
+      parentValue:string = "parent1";
+      constructor() {
+      }
+      ngOnInit() {
+          this.parent();
+      }
+      parent() {
+          console.log("I am parent");
+      }
+  }
+  parent.component.html
+  <p>parent works!</p>
+  <app-child [myParent]="parentValue"></app-child>
+  
+
+  
+  
 
 
   
