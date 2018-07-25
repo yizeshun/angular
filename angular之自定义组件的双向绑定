@@ -1,0 +1,66 @@
+#例如子组件的双向绑定属性为params
+具体做法如下：
+  child.component.ts
+  import { Component, OnInit, Inject, Output, Input, EventEmitter } from '@angular/core';
+  @Component({
+      selector: 'app-child',
+      templateUrl: './child.component.html',
+      styleUrls: ['./child.component.css']
+  })
+  export class ChildComponent implements OnInit {
+      _params:any;
+      @Output() paramsChange:any = new EventEmitter<any>();
+
+      set params(value:any) {
+          this._params = value;
+          this.paramsChange.emit(this._params)
+      }
+      @Input()
+      get params() {
+          return this._params;
+      }
+      constructor() {
+      }
+      ngOnInit() {
+          this.child();
+      }
+      child() {
+          console.log("I am child");
+      }
+      add() {
+          this.params++;
+      }
+  }
+  注意add方法中使用的是params而并不是_params,只有使用params
+  属性才会触发setter截取函数,才能向组件外传递最新的属性值,才
+  能实现双向绑定
+  child.component.html
+  <p>child works!</p>
+  <p>子组件中的param变量值:{{_params}}</p>
+  <button (click)="add()">子组件中的变量修改</button>
+  parent.components.ts
+  import { Component, OnInit, ViewChild } from '@angular/core';
+  @Component({
+      selector: 'app-parent',
+      templateUrl: './parent.component.html',
+      styleUrls: ['./parent.component.css']
+  })
+  export class ParentComponent implements OnInit {
+      testParam:number = 1;
+      constructor() {
+      }
+      ngOnInit() {
+          this.parent();
+      }
+      parent() {
+          console.log("I am parent");
+      }
+      decreace() {
+          this.testParam++;
+      }
+  }
+  parent.component.html
+  <p>parent works!</p>
+  <app-child [(params)]="testParam"></app-child>
+  <p>父组件中的param变量值:{{testParam}}</p>
+  <button (click)="decreace()">父组件中的变量值改变</button>
