@@ -1,0 +1,124 @@
+#基于select2的angular下拉框
+  1.select2版本v4
+  2.支持多选配置
+select.componet.ts
+import { Component, OnInit, ElementRef, Input, Output, EventEmitter  } from '@angular/core';
+const $: any = (window as any).$;
+
+@Component({
+    selector: 'app-select',
+    templateUrl: './select.component.html',
+    styleUrls: ['./select.component.css']
+})
+export class SelectComponent implements OnInit {
+    /**
+     * 如果是multiple模式,则options格式如下:
+     * options = [
+     *      {label:"类别一", value:[{label:"选项一",value:1},{label:"选项二",value:2}]},
+     *      {label:"类别二", value:[{label:"选项三",value:3},{label:"选项四",value:4}]}
+     * ]
+     *
+     *如果multiple是false,则options格式如下:
+     * options = [
+     *      {label:"选项一",value:1},
+     *      {label:"选项二",value:2},
+     *      {label:"选项三",value:3},
+     *      {label:"选项四",value:4}
+     * ]
+     *
+     * 双向绑定属性为selectValue
+     */
+    $elem:any;
+    selectObj:any;
+    @Input()multiple:boolean = false;
+    selectConf:any = {};
+    //双向绑定的属性为selectValue
+    _selectValue:any;
+    @Input() options:any;
+    @Output() selectValueChange:any = new EventEmitter<any>();
+
+    set selectValue(value:any) {
+        this._selectValue = value;
+        this.selectValueChange.emit(this._selectValue);
+    }
+    @Input()
+    get selectValue() {
+
+        return this._selectValue;
+    }
+
+    constructor(private el:ElementRef) {
+        this.$elem = $(el.nativeElement);
+    }
+
+    setMultipleHtml() {
+        if(this.multiple) {
+            this.$elem.find('#select2').attr("multiple","multiple");
+        }
+    }
+
+    setMultipleConf() {
+        if(this.multiple) {
+            this.selectConf = {
+                tags: true,
+            }
+        }
+    }
+
+    setDefault() {
+        this.selectConf.val = this.selectValue;
+    }
+
+    setMultiple() {
+        this.setMultipleHtml();
+        this.setMultipleConf();
+        this.setDefault();
+    }
+
+    setDefaultDisplay() {
+        this.$elem.find('select').val(this.selectValue).trigger("change");
+    }
+
+    initSelect2() {
+        this.selectObj = this.$elem.find('#select2').val('3').select2(this.selectConf);
+    }
+
+    addSelectChange() {
+        this.selectObj.on("change",()=>{
+            this.selectValue = this.selectObj.val()
+        })
+    }
+
+    init() {
+        //对options数据进行校验
+        //如果multiple为true,配置multiple select所需
+        this.setMultiple();
+        //初始化select2 对象
+        this.initSelect2();
+        //注册select2对象的选项改变事件
+        this.addSelectChange();
+    }
+
+    ngAfterViewInit() {
+        //设置初始化展示项
+        this.setDefaultDisplay()
+    }
+
+    ngOnInit() {
+        this.init();
+    }
+
+}
+
+select.component.html
+<select id="select2"  class="form-control">
+    <ng-container *ngIf="multiple">
+        <optgroup *ngFor="let group of options; let index = index;" label="{{group.label}}">
+            <option value="{{item.value}}" *ngFor="let item of group.value;">{{item.label}}</option>
+        </optgroup>
+    </ng-container>
+    <ng-container *ngIf="!multiple">
+        <option value="{{item.value}}" *ngFor="let item of options;">{{item.label}}</option>
+    </ng-container>
+</select>
+  
