@@ -1,0 +1,11 @@
+1.需求
+  一个图标库有时并不能满足网站的图标需求，例如ant-design提供的图标库就没有bars图标
+2.安装
+  npm install --save font-awesome
+3.引入项目
+  在angular工程中的src/styles.styl中引入样式
+  @import '~font-awesome/css/font-awesome.css'
+4.使用
+  在需要的代码中使用格式
+  <i class="fa fa-area-chart"></i>
+  
