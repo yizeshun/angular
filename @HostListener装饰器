@@ -1,0 +1,43 @@
+@HostListener用于侦听宿主元素发生的事件，同时可以侦听外部元素的事件。
+1.侦听宿主元素的事件
+@HostListener('click', ['$event', '$event.target'])
+onClick(event, targetElement) {
+    const insideClick = this._ele.nativeElement.contains(targetElement);
+    if (!insideClick) {
+        this.appClickOutSide.emit(event);
+    }
+}
+2.侦听外部元素的事件,以document为例
+@HostListener('document: click', ['$event', '$event.target'])
+onClick(event, targetElement) {
+    const insideClick = this._ele.nativeElement.contains(targetElement);
+    if (!insideClick) {
+        this.appClickOutSide.emit(event);
+    }
+}
+3.实例
+3.1 说明
+  侦听宿主元素之外的点击事件，点击宿主元素本身及其后代不触发,常用于自定义组件点击空白区域关闭面板功能
+  这里将其写成一个指令
+import {Directive, ElementRef, HostListener, Output, EventEmitter} from '@angular/core';
+
+@Directive({
+    selector: '[appClickOutSide]'
+})
+export class ClickOutSideDirective {
+    @Output() appClickOutSide = new EventEmitter();
+    constructor(private _ele: ElementRef) {
+    }
+
+    @HostListener('document: click', ['$event', '$event.target'])
+    onClick(event, targetElement) {
+        const insideClick = this._ele.nativeElement.contains(targetElement);
+        if (!insideClick) {
+            this.appClickOutSide.emit(event);
+        }
+    }
+}
+3.2 使用
+<div class="content-container" (appClickOutSide)="clickOutSide($event)"></div>
+
+
