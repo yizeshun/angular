@@ -1,0 +1,30 @@
+正式进入内容之前,先看一个问题
+angular模板中有以下代码,其中param为组件
+类中的一个number型变量,请问td的colspan属性
+生效不?
+<td colspan="param"></td>
+结果是不生效，那么如何使该td的colspan属性可以
+配置呢
+
+知识点：
+  1.在angular中，一旦开始数据绑定，就不再跟 HTML attribute 打交道了。
+  而是设置 DOM 元素、组件和指令的 property
+  2.HTML attribute 与 DOM property 的对比
+  attribute 是由 HTML 定义的
+  property 是由 DOM (Document Object Model) 定义的
+  少量 HTML attribute 和 property 之间有着 1:1 的映射，如 id
+  有些 HTML attribute 没有对应的 property，如 colspan
+  有些 DOM property 没有对应的 attribute，如 textContent
+  大量 HTML attribute 看起来映射到了 property…… 但却不像你想的那样
+  attribute 初始化 DOM property，然后它们的任务就完成了
+  property 的值可以改变；attribute 的值不能改变
+  disabled 这个 attribute 是另一种特例。按钮的 disabled 这个 property 是 false，因为默认情况下按钮是可用的
+  当你添加 disabled 这个 attribute 时，只要它出现了按钮的 disabled 这个 property 就初始化为 true，于是按钮就被禁用了
+  添加或删除 disabled 这个 attribute 会禁用或启用这个按钮，与
+  attribute 的值无关紧要，这就是你为什么没法通过 <button disabled="false">仍被禁用</button> 这种写法来启用按钮
+  设置按钮的 disabled 这个 property（如，通过 Angular 绑定）可以禁用或启用这个按钮，这就是 property 的价值
+  在 Angular 的世界中，attribute 唯一的作用是用来初始化元素和指令的状态。 
+  当进行数据绑定时，只是在与元素和指令的 property 和事件打交道，而 attribute 就完全靠边站了。
+  3.attribute 绑定
+  attribute 绑定的语法与属性绑定类似。 但方括号中的部分不是元素的属性名，而是由attr前缀，一个点 (.) 和 attribute 的名字组成。
+  可以通过值为字符串的表达式来设置 attribute 的值。这里把 [attr.colspan] 绑定到一个计算值
