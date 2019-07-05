@@ -28,3 +28,7 @@ angular模板中有以下代码,其中param为组件
   3.attribute 绑定
   attribute 绑定的语法与属性绑定类似。 但方括号中的部分不是元素的属性名，而是由attr前缀，一个点 (.) 和 attribute 的名字组成。
   可以通过值为字符串的表达式来设置 attribute 的值。这里把 [attr.colspan] 绑定到一个计算值
+  4.CSS 类绑定
+  [class.class-name]
+  5.样式绑定
+  [style.style-property]
