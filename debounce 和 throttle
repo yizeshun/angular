@@ -1,0 +1,39 @@
+1. debounce 如果一个函数在一个很短的时间间隔内触发很多次， debounce可以控制该函数在这段时间过后的delay时间触发一次
+
+export const debounce = (fn, delay = 200, immediate = true) => {
+    let timer;
+    return function() {
+        const ctx = this;
+        const args = arguments;
+        const callNow = immediate && !timer;
+        clearTimeout(timer);
+        timer = setTimeout(() => {fn.apply(ctx, args); }, delay);
+        if (callNow) {
+            fn.apply(ctx, args);
+        }
+    };
+};
+immediate = true 代表函数立即触发一次
+例子：
+  （1）比如mousemove事件，会在很短的时间内触发很多次回调函数fn,当用debounce后，只要鼠标在滑行，就不会触发fn，当鼠标停止后，经过delay时间，fn触发
+  （2）类似百度搜索的场景，当用户输入停顿delay时间后才去向后端请求关键字对应的热搜词汇展示出来
+  
+2. throttle 如果一个函数在很短的时间内触发很多次， throttle可以控制该函数以更低的频率去执行， 比如之前是20ms执行一次，通过设置delay = 200ms，则
+函数会以200ms的频率触发。
+
+export const throttle = (fn, delay = 200) => {
+    let timer;
+    let last; // 上一次执行的时间点
+    return function () {
+        const ctx = this;
+        const args = arguments;
+        const now = new Date().getTime();
+        if (last && now < last + delay) {
+            clearTimeout(timer);
+            timer = setTimeout(() => {last = now; fn.apply(ctx, args); }, delay);
+        } else {
+            last = now; fn.apply(ctx, args);
+        }
+    };
+};
+
