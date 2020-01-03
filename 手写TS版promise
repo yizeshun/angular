@@ -1,0 +1,113 @@
+// 方法成功执行的resolve函数
+type promiseResolve = (value: any) => void
+// 方法失败执行的reject函数
+type promiseReject = (value: any) => void
+// promise构造器接收的函数
+type promiseExecutor = (resolve?: promiseResolve, reject?: promiseReject) => void
+// then方法中的onFulfilled回调函数
+type onFulfilled = (value?: any) => void
+// then方法中的onRejected函数
+type onRejected = (value?: any) => void
+// then方法
+type promiseThen = (onFulfilled?: onFulfilled, onRejected?: onRejected) => any
+// promise的三种状态 
+enum PromiseStatus {
+    PENDING = 'pending',
+    FULFILLED = 'fulfilled',
+    REJECTED= 'rejected'
+}
+
+class MyPromise {
+    // promise的状态,默认为pending
+    status = PromiseStatus.PENDING;
+    // promise的值
+    value;
+    // then方法中注册的fulfille回调函数
+    onFulfilledCallbacks = [];
+    // then方法中注册的rejected回调函数
+    onRejectedCallbacks = [];
+    // resolve方法
+    resolve: promiseResolve = (value: any) => {
+        if (this.status === PromiseStatus.PENDING) {
+            this.status = PromiseStatus.FULFILLED;
+            this.value = value;
+            this.onFulfilledCallbacks.forEach((item) => item());
+        }
+    }
+    // reject方法
+    reject: promiseReject = (value: any) => {
+        if (this.status === PromiseStatus.PENDING) {
+            this.status = PromiseStatus.REJECTED;
+            this.value = value;
+            this.onRejectedCallbacks.forEach((item) => item());
+        }
+    }
+    // then方法
+    then: promiseThen = (onFulfilled, onRejected) => {
+        const promise2 = new MyPromise((resolve, reject) => {
+            if (this.status === PromiseStatus.FULFILLED) {
+                setTimeout(() => {
+                    const x = onFulfilled(this.value);
+                    this.resolvePromise(x, promise2, resolve, reject)
+                }, 0);
+            }
+            if (this.status === PromiseStatus.REJECTED) {
+                setTimeout(() => {
+                    const x = onRejected(this.value);
+                    this.resolvePromise(x, promise2, resolve, reject)
+                }, 0);
+            }
+            if (this.status === PromiseStatus.PENDING) {
+                this.onFulfilledCallbacks.push(() => {
+                    setTimeout(() => {
+                        const x = onFulfilled(this.value);
+                        this.resolvePromise(x, promise2, resolve, reject)
+                    }, 0)
+                });
+                this.onRejectedCallbacks.push(() => {
+                    setTimeout(() => {
+                        const x = onRejected(this.value);
+                        this.resolvePromise(x, promise2, resolve, reject);
+                    }, 0);
+                });
+            }
+        })
+        return promise2
+    }
+    // resolvePromise
+    resolvePromise(x, promise2, resolve, reject) {
+        // 如果onFullfilled的返回值是promise2本身, 报错
+        if (x === promise2) {
+            return reject(new TypeError('Chaining cycle detected for promise'));
+        }
+        if (x && (typeof x === 'object' || typeof x === 'function')) {
+            // A+规定，声明then = x的then方法
+            let then = x.then;
+            // 如果then是函数，就默认是promise了
+            if (typeof then === 'function') {
+                // 就让then执行 第一个参数是this   后面是成功的回调 和 失败的回调
+                then.call(x,
+                    (y) => {
+                        this.resolvePromise(y, promise2, resolve, reject);
+                    },
+                    (err) => {
+                        reject(err);
+                    }
+                )
+            } else {
+                resolve(x)
+            }
+        } else {
+            // 普通值
+            resolve(x);
+        }
+    }
+
+    constructor(executor: promiseExecutor) {
+        try {
+            executor(this.resolve, this.reject)
+        } catch(err) {
+            this.reject(err);
+        }
+    }
+}
