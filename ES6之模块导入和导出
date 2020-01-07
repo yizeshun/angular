@@ -1,0 +1,16 @@
+1.导出
+模块导出有两种方式
+ 1.1 直接在定义前面export关键字
+ export class A {
+    constructor() {} 
+ }
+ 1.2 先定义，在文件末尾通过export关键字导出，导出的东西用中括号包起来
+ class A {
+    constructor() {}
+ }
+ export {A}
+ 
+ 2.导入
+ 模块导出方式如下
+ import {A} from './path'；
+ 注意这里有个坑，即使path.js和当前文件在一个目录，'./'该标记也不能丢，不然导入不了
